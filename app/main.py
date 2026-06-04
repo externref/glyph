@@ -15,7 +15,6 @@ from pydantic import BaseModel
 from contextlib import asynccontextmanager
 import certifi
 
-ca = certifi.where()
 
 import dotenv
 
@@ -27,7 +26,7 @@ db_client = None
 async def lifespan(app):
     global db_client
 
-    db_client = AsyncIOMotorClient(os.environ["MONGODB_URI"], tlsCAFile=ca)
+    db_client = AsyncIOMotorClient(os.environ["MONGODB_URI"], tls=True, tlsCAFile=certifi.where())
 
     yield
 
