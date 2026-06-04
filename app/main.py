@@ -12,14 +12,29 @@ from fastapi.staticfiles import StaticFiles
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 
+from contextlib import asynccontextmanager
 import certifi
+
 ca = certifi.where()
 
 import dotenv
 
 dotenv.load_dotenv()
+db_client = None
 
-app = fastapi.FastAPI()
+
+@asynccontextmanager
+async def lifespan(app):
+    global db_client
+
+    db_client = AsyncIOMotorClient(os.environ["MONGODB_URI"], tlsCAFile=ca)
+
+    yield
+
+    db_client.close()
+
+
+app = fastapi.FastAPI(lifespan=lifespan)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
@@ -33,17 +48,6 @@ db_client: AsyncIOMotorClient = None
 
 def get_collection():
     return db_client["glyph"]["pastes"]
-
-
-@app.on_event("startup")
-async def startup():
-    global db_client
-    db_client = AsyncIOMotorClient(os.environ["MONGODB_URI"], tlsCAFile=ca)
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    db_client.close()
 
 
 class PasteCreate(BaseModel):
