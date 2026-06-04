@@ -16,3 +16,6 @@ dev = [
     "isort>=8.0.1",
     "ruff>=0.15.15",
 ]
+
+[tool.vercel]
+entrypoint = "main:app"
