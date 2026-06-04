@@ -12,6 +12,9 @@ from fastapi.staticfiles import StaticFiles
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 
+import certifi
+ca = certifi.where()
+
 import dotenv
 
 dotenv.load_dotenv()
@@ -35,7 +38,7 @@ def get_collection():
 @app.on_event("startup")
 async def startup():
     global db_client
-    db_client = AsyncIOMotorClient(os.environ["MONGODB_URI"])
+    db_client = AsyncIOMotorClient(os.environ["MONGODB_URI"], tlsCAFile=ca)
 
 
 @app.on_event("shutdown")
