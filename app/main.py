@@ -12,6 +12,10 @@ from fastapi.staticfiles import StaticFiles
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 
+import dotenv
+
+dotenv.load_dotenv()
+
 app = fastapi.FastAPI()
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -133,7 +137,4 @@ async def delete_paste(paste_id: str, delete_key: str):
 
 
 if __name__ == "__main__":
-    import dotenv
-
-    dotenv.load_dotenv()
     uvicorn.run(app, host="0.0.0.0", port=8000)
